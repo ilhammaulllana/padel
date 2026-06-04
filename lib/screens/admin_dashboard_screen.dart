@@ -68,7 +68,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               side: BorderSide(color: Colors.white.withOpacity(0.05)),
             ),
             child: Container(
-              width: 400,
+              constraints: const BoxConstraints(maxWidth: 400),
+              width: MediaQuery.of(context).size.width * 0.9,
               padding: const EdgeInsets.all(32),
               child: Form(
                 key: _loginFormKey,
@@ -257,56 +258,53 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Welcome Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome Back, Admin',
-                        style: GoogleFonts.spaceGrotesk(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Live system monitors active bookings across all clubs.',
-                        style: GoogleFonts.outfit(color: const Color(0xFF9EAFBC), fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.greenAccent.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
+              isDesktop
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.greenAccent,
-                            shape: BoxShape.circle,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome Back, Admin',
+                                style: GoogleFonts.spaceGrotesk(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'Live system monitors active bookings across all clubs.',
+                                style: GoogleFonts.outfit(color: const Color(0xFF9EAFBC), fontSize: 13),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 16),
+                        _buildOnlineBadge(),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          'SYSTEM ONLINE',
-                          style: GoogleFonts.outfit(
-                            color: Colors.greenAccent,
+                          'Welcome Back, Admin',
+                          style: GoogleFonts.spaceGrotesk(
+                            color: Colors.white,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            fontSize: 10,
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Live system monitors active bookings across all clubs.',
+                          style: GoogleFonts.outfit(color: const Color(0xFF9EAFBC), fontSize: 13),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildOnlineBadge(),
                       ],
                     ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 24),
 
               // KPI Dashboard Metric Grid
@@ -319,7 +317,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
-                    childAspectRatio: constraints.maxWidth > 800 ? 1.5 : 1.8,
+                    childAspectRatio: constraints.maxWidth > 800 ? 1.5 : (constraints.maxWidth > 400 ? 1.7 : 1.35),
                     children: [
                       _buildMetricCard('Total Bookings', totalBookings.toString(), Icons.book_online, Colors.white24),
                       _buildMetricCard('Pending Validation', pendingCount.toString(), Icons.hourglass_empty_rounded, Colors.orangeAccent),
@@ -413,6 +411,38 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildOnlineBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.greenAccent.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: const BoxDecoration(
+              color: Colors.greenAccent,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'SYSTEM ONLINE',
+            style: GoogleFonts.outfit(
+              color: Colors.greenAccent,
+              fontWeight: FontWeight.bold,
+              fontSize: 10,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -523,11 +553,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.person, color: Colors.white30, size: 14),
+                    const Icon(Icons.person, color: Colors.white30, size: 14),
                     const SizedBox(width: 6),
-                    Text(
-                      '${booking.customerName} (+${booking.customerPhone})',
-                      style: GoogleFonts.outfit(color: const Color(0xFF9EAFBC), fontSize: 12),
+                    Expanded(
+                      child: Text(
+                        '${booking.customerName} (+${booking.customerPhone})',
+                        style: GoogleFonts.outfit(color: const Color(0xFF9EAFBC), fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
